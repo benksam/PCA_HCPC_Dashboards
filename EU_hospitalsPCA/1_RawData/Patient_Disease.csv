@@ -1,0 +1,151 @@
+Acronym,Disease
+A-T_Z,All causes of diseases (A00-Z99) excluding V00-Y98
+A-T_Z_XNB,All causes of diseases (A00-Z99) excluding V00-Y98 and Z38
+A_B,Certain infectious and parasitic diseases (A00-B99)
+A15-A19_B90,Tuberculosis
+A00-A08,Intestinal infectious diseases except diarrhoea
+A09,Diarrhoea and gastroenteritis of presumed infectious origin
+A40_A41,Septicaemia
+B20-B24,Human immunodeficiency virus [HIV] disease
+A_B_OTH,Other infectious and parasitic diseases (remainder of A00-B99)
+C00-D48,Neoplasms
+C18-C21,"Malignant neoplasm of colon, rectosigmoid junction, rectum, anus and anal canal"
+C33_C34,"Malignant neoplasm of trachea, bronchus and lung"
+C43_C44,Malignant neoplasms of skin
+C50,Malignant neoplasm of breast
+C53-C55,Malignant neoplasm of uterus
+C56,Malignant neoplasm of ovary
+C61,Malignant neoplasm of prostate
+C67,Malignant neoplasm of bladder
+C_OTH,Other malignant neoplasms (remainder of C00-C97)
+D00-D09,In situ neoplasms
+D12,"Benign neoplasm of colon, rectum, anus and anal canal"
+D25,Leiomyoma of uterus
+D00-D48_OTH,"Other in situ neoplasms, benign neoplasms and neoplasms of uncertain or unknown behaviour (remainder of D00-D48)"
+D50-D89,Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism
+D50-D64,Anaemias
+D65-D89,Other diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism
+E,"Endocrine, nutritional and metabolic diseases (E00-E90)"
+E10-E14,Diabetes mellitus
+E_OTH,"Other endocrine, nutritional and metabolic diseases (remainder of E00-E90)"
+F,Mental and behavioural disorders (F00-F99)
+F00-F03,Dementia
+F10,Mental and behavioural disorders due to use of alcohol
+F11-F19,Mental and behavioural disorders due to psychoactive substance use
+F20-F29,"Schizophrenia, schizotypal and delusional disorders"
+F30-F39,Mood [affective] disorders
+F_OTH,Other mental and behavioural disorders (remainder of F00-F99)
+G,Diseases of the nervous system (G00-G99)
+G30,Alzheimer disease
+G35,Multiple sclerosis
+G40_G41,"Epilepsy, status epilepticus"
+G45,Transient cerebral ischaemic attacks and related syndromes
+G_OTH,Other diseases of the nervous system (remainder of G00-G99)
+H00-H59,Diseases of the eye and adnexa
+H25_H26_H28,Cataract
+H00-H59_OTH,Other diseases of the eye and adnexa (remainder of H00-H59)
+H60-H95,Diseases of the ear and mastoid process
+I,Diseases of the circulatory system (I00-I99)
+I10-I15,Hypertensive diseases
+I20,Angina pectoris
+I21_I22,Acute myocardial infarction including subsequent myocardial infarction
+I23-I25,Other ischaemic heart disease
+I26-I28,Pulmonary heart disease and diseases of pulmonary circulation
+I44-I49,Conduction disorders and cardiac arrhythmias
+I50,Heart failure
+I60-I69,Cerebrovascular diseases
+I70,Atherosclerosis
+I83,Varicose veins of lower extremities
+I_OTH,Other diseases of the circulatory system (remainder of I00-I99)
+J,Diseases of the respiratory system (J00-J99)
+J00-J11,Acute upper respiratory infections and influenza
+J12-J18,Pneumonia
+J20-J22,Other acute lower respiratory infections
+J35,Chronic diseases of tonsils and adenoids
+UPRESPIR_OTH,"Other diseases of upper respiratory tract (J30-J34, J36-J39)"
+J45_J46,Asthma and status asthmaticus
+J40-J44_J47,Other lower respiratory diseases
+J60-J99,Other diseases of the respiratory system
+K,Diseases of the digestive system (K00-K93)
+K00-K08,Disorders of teeth and supporting structures
+K09-K14,"Other diseases of oral cavity, salivary glands and jaws"
+K20-K23,Diseases of oesophagus
+K25-K28,"Ulcer of stomach, duodenum and jejunum"
+K29-K31,Dyspepsia and other diseases of stomach and duodenum
+K35-K38,Diseases of appendix
+K40,Inguinal hernia
+K41-K46,Other abdominal hernia
+K50_K51,Crohn disease and ulcerative colitis
+K52,Other noninfective gastroenteritis and colitis
+K56,Paralytic ileus and intestinal obstruction without hernia
+K57,Diverticular disease of intestine
+K60-K62,Diseases of anus and rectum
+INTESTINE_OTH,"Other diseases of intestine (K55,K58-K59,K63)"
+K70,Alcoholic liver disease
+K71-K77,Other diseases of liver
+K80,Cholelithiasis
+K81-K83,Other diseases of gallbladder and biliary tract
+K85-K87,Diseases of pancreas
+K_OTH,Other diseases of the digestive system (remainder of K00-K93)
+L,Diseases of the skin and subcutaneous tissue (L00-L99)
+L00-L08,Infections of the skin and subcutaneous tissue
+L20-L45,"Dermatitis, eczema and papulosquamous disorders"
+L_OTH,Other diseases of the skin and subcutaneous tissue (remainder of L00-L99)
+M,Diseases of the musculoskeletal system and connective tissue (M00-M99)
+M16,Coxarthrosis [arthrosis of hip]
+M17,Gonarthrosis [arthrosis of knee]
+M23,Internal derangement of knee
+ARTHROPAT_OTH,"Other arthropathies (M00-M15, M18-M22 ,M24-M25)"
+M30-M36,Systemic connective tissue disorders
+M40-M49,Deforming dorsopathies and spondylopathies
+M50_M51,"Cervical disc disorders, other intervertebral disc disorders"
+M54,Dorsalgia
+M60-M79,Soft tissue disorders
+M53_M80-M99,Other disorders of the musculoskeletal system and connective tissue
+N,Diseases of the genitourinary system (N00-N99)
+N00-N16,Glomerular and renal tubulo-interstitial diseases
+N17-N19,Renal failure
+N20-N23,Urolithiasis
+N25-N39,Other diseases of the urinary system
+N40,Hyperplasia of prostate
+N41-N51,Other diseases of male genital organs
+N60-N64,Disorders of breast
+N70-N77,Inflammatory diseases of female pelvic organs
+N91-N95,"Menstrual, menopausal and other female genital conditions"
+N_OTH,Other diseases of the genitourinary system (remainder of N00-N99)
+O,"Pregnancy, childbirth and the puerperium (O00-O99)"
+O04,Medical abortion
+ABORT_OTH,"Other pregnancy with abortive outcome (O00-O03,O05-O08)"
+O10-O48,Complications of pregnancy predominantly in the antenatal period
+O60-O75,Complications of labour and delivery
+O80,Single spontaneous delivery
+O81-O84,Other delivery
+O85-O92,Complications predominantly related to the puerperium
+O95-O99,Other obstetric conditions
+P,Certain conditions originating in the perinatal period (P00-P96)
+P07,"Disorders related to short gestation and low birth weight, not elsewhere classified"
+P_OTH,Other conditions originating in the perinatal period (remainder of P00-P96)
+Q,"Congenital malformations, deformations and chromosomal abnormalities (Q00-Q99)"
+R,"Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified (R00-R99)"
+R07,Pain in throat and chest
+R10,Abdominal and pelvic pain
+R69,Unknown and unspecified causes of morbidity
+R_OTH,"Other symptoms, signs and abnormal clinical and laboratory findings (remainder of R00-R99)"
+S_T,"Injury, poisoning and certain other consequences of external causes (S00-T98)"
+INJ_OTH,"Other injuries (S10-S51, S53-S71, S73-S81, S83-T14, T79)"
+S06,Intracranial injury
+INJ_HEAD_OTH,"Other injuries to the head (S00-S05, S07-S09)"
+S52,Fracture of forearm
+S72,Fracture of femur
+S82,"Fracture of lower leg, including ankle"
+T20-T32,Burns and corrosions
+T36-T65,"Poisonings by drugs, medicaments and biological substances and toxic effects"
+T80-T88,"Complications of surgical and medical care, not elsewhere classified"
+T90-T98,"Sequelae of injuries, of poisoning and of other consequences of external causes"
+S_T_OTH,Other and unspecified effects of external causes (remainder of S00-T98)
+Z,Factors influencing health status and contact with health services (Z00-Z99)
+Z03,Medical observation and evaluation for suspected diseases and conditions
+Z30,Contraceptive management
+Z38,Liveborn infants according to place of birth
+Z51,Other medical care
+Z_OTH,Other factors influencing health status and contact with health services (remainder of Z00-Z99)

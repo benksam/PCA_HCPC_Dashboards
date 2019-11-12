@@ -1,0 +1,1583 @@
+---
+title: "PCA/HCPC Results"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    theme: spacelab
+    css: "sidebar.css"
+runtime: shiny
+---
+
+
+```{r setup, include=FALSE}
+# author: "Samir"
+# date: "10/11/2019"
+library(flexdashboard)
+library(shiny)
+source("Git_000_src_cd_librariesPCA.R")
+source("Git_TRAIN_PCA_010_src_cd_HospitalData.R")
+# source("Git_0011_src_cd_CarNrg_TS.R")
+# source("Git_0012_src_cd_CarNrg_Map.R")
+
+```
+
+
+
+PCA/HCPC Country Interpretation
+===============================================================================
+
+Row {data-height=100}
+-----------------------------------------------------------------------
+
+```{r react_cluster_13, include=FALSE}
+
+
+
+
+react_hcpc_country <- reactive({
+
+    data_hcpc <- HCPC_list_c %>% 
+      filter(Age == input$age_groups_country) %>% 
+      filter(Variable == input$variable_country) %>% 
+      pluck("value", 1) # react_index_age()) # %>%  # react_index_age()) %>% 
+      
+    data_hcpc
+    
+  })
+
+
+react_hcpc_axes_country = reactive({
+
+  axes = c()
+  
+    if(input$dimensions_country == "Dimensions 1 and 2"){
+      
+     axes = 1:2 } else {
+     axes = 3:4
+      
+      
+    }
+
+    axes
+    
+  })
+
+
+
+
+### TESTING: Dimension 1
+
+
+### List of variable selections as function of age group: Variables_sel_input
+# Variables_sel_input # indexed by 1-7 agegroups!!!
+
+age_group_country_sel <- reactive({
+
+selection_age = tibble(AgeGroup = ages,
+                      Index = 1:7)
+
+selected_age = selection_age %>% 
+  filter(AgeGroup == input$age_groups_country) %>% # "TOTAL") %>% # 
+  pull(Index)
+
+
+variables_sel_input[[selected_age]]
+
+})
+
+# Mapping function instead!!! Since 7 Age groups!!!
+
+# combinaison1 <- reactive({
+#   
+#   dims_age_var_names %>% 
+#     filter(Ages == age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+#     filter(Dims == "dim1") %>% 
+#     pluck("value") %>% 
+#     unlist()
+#     
+#   })
+
+
+    observeEvent(input$age_groups_country, {
+    combi <- age_group_country_sel()
+    updateSelectInput(session, "variable_country", choices = combi)
+  })
+
+
+
+
+#### Dim OK excep filtrage by country variable - NEED OBSERVE agegroup / UPDATE variable country
+react_dim1_age_var <- reactive({
+
+dim1_age_var = res_PCA_dim12_c %>% 
+  filter(Age == input$age_groups_country) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_country) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim1") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+  })
+
+
+react_dim2_age_var <- reactive({
+  
+  
+dim2_age_var = res_PCA_dim12_c %>% 
+  filter(Age == input$age_groups_country) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_country) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim2") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+
+  })
+
+
+react_dim3_age_var <- reactive({
+
+dim3_age_var = res_PCA_dim34_c %>% 
+  filter(Age == input$age_groups_country) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_country) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim3") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+
+
+  })
+
+
+
+react_dim4_age_var <- reactive({
+
+dim4_age_var = res_PCA_dim34_c %>% 
+  filter(Age == input$age_groups_country) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_country) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim4") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+  })
+
+
+```
+
+
+
+```{r input_clust_13}
+
+selectInput("age_groups_country",
+            "Select an age group:",
+            choices = age_country)
+
+
+selectInput("variable_country",
+            "Select a variable:",
+            choices = "No Variables") # variable_country
+
+```
+
+
+
+Row {.sidebar data-width=600}
+-----------------------------------------------------------------------
+
+
+```{r clust_13_map}
+
+selectInput("dimensions_country",
+            "Select the dimensions of the cluster:",
+            choices = c("Dimensions 1 and 2", "Dimensions 3 and 4"))
+
+
+renderPlot({
+
+fviz_cluster(react_hcpc_country(), 
+             axes = react_hcpc_axes_country(), 
+             repel = T, 
+             ggtheme = theme_bw() +
+  theme(text = element_text(family = "serif", size = 14),
+        title = element_text(color = "#990000")))
+  
+  })
+
+hr()
+
+h5(strong("About Cluster Analysis ...")) #,
+                                   p(h5("These plots aim at clustering countries into groups showing overall similar characteristics in terms of hospital discharges by disease categories:"))
+
+                                   p(h5("1. The", strong("clusters"), "were obtained using dimensionality reduction (PCA) and hierarchical clustering techniques.")) #,
+                                   p(h5("2. The first", strong("4 dimensions"),"represents about 70 - 80 pct. of the variability in the dataset.")) #))
+                       
+```
+
+
+
+Row {data-width=400 .tabset}
+-----------------------------------------------------------------------
+
+### Dimension 1
+
+
+```{r clust_13_col_dim13_11}
+# data-height=500 
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Alternative Engine", "Diesel Engine"))`
+# 
+
+
+DT::renderDataTable({
+
+datatable(react_dim1_age_var(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+
+```
+
+
+
+### Dimension 2
+
+```{r clust_13_col_dim13_12}
+
+
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Electrical Engine", "Diesel excl. Hybrids"))` 
+### Cadre 1 - Tab 2
+
+
+
+DT::renderDataTable({
+
+datatable(react_dim2_age_var(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+### Dimension 3
+
+
+
+```{r clust_13_col_dim24_21}
+# Row {data-width=400 data-height=500 .tabset}
+# -----------------------------------------------------------------------
+
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Petrolium excl. Hybrids", "Other Engine"))`
+### Cadre 2 - Tab 1
+
+
+
+DT::renderDataTable({
+
+datatable(react_dim3_age_var(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         # columnDefs = list(list(className = 'dt-center')), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+
+### Dimension 4
+
+```{r clust_13_col_dim24_22}
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Petrolium Engine", "Gas Engine"))` 
+### Cadre 2 - Tab 2
+
+
+
+DT::renderDataTable({
+
+datatable(react_dim4_age_var(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+
+
+PCA/HCPC Region Interpretation
+===============================================================================
+
+Row {data-height=100}
+-----------------------------------------------------------------------
+
+```{r react_cluster_13r, include=FALSE}
+
+
+react_hcpc_region <- reactive({
+
+    data_hcpc <- HCPC_list_r %>% 
+      filter(Age == input$age_groups_region) %>% 
+      filter(Variable == input$variable_region) %>% 
+      pluck("value", 1) # react_index_age()) # %>%  # react_index_age()) %>% 
+      
+    data_hcpc
+    
+  })
+
+
+react_hcpc_axes_region = reactive({
+
+  axes = c()
+  
+    if(input$dimensions_region == "Dimensions 1 and 2"){
+      
+     axes = 1:2 } else {
+     axes = 3:4
+      
+      
+    }
+
+    axes
+    
+  })
+
+
+
+### List of variable selections as function of age group: Variables_sel_input
+# Variables_sel_input # indexed by 1-7 agegroups!!!
+
+age_group_region_sel <- reactive({
+
+selection_age = tibble(AgeGroup = ages,
+                      Index = 1:7)
+
+selected_age = selection_age %>% 
+  filter(AgeGroup == input$age_groups_region) %>% # "TOTAL") %>% # 
+  pull(Index)
+
+
+variables_sel_input_r[[selected_age]]
+
+})
+
+# Mapping function instead!!! Since 7 Age groups!!!
+
+# combinaison1 <- reactive({
+#   
+#   dims_age_var_names %>% 
+#     filter(Ages == age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+#     filter(Dims == "dim1") %>% 
+#     pluck("value") %>% 
+#     unlist()
+#     
+#   })
+
+
+    observeEvent(input$age_groups_region, {
+    combi <- age_group_region_sel()
+    updateSelectInput(session, "variable_region", choices = combi)
+  })
+
+
+
+react_dim1_age_var_r <- reactive({
+
+dim1_age_var = res_PCA_dim12_r %>% 
+  filter(Age == input$age_groups_region) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_region) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim1") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+  })
+
+
+react_dim2_age_var_r <- reactive({
+  
+  
+dim2_age_var = res_PCA_dim12_r %>% 
+  filter(Age == input$age_groups_region) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_region) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim2") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+
+  })
+
+
+react_dim3_age_var_r <- reactive({
+
+dim3_age_var = res_PCA_dim34_r %>% 
+  filter(Age == input$age_groups_region) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_region) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim3") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+
+
+  })
+
+
+
+react_dim4_age_var_r <- reactive({
+
+dim4_age_var = res_PCA_dim34_r %>% 
+  filter(Age == input$age_groups_region) %>% # "TOTAL") %>% #"Y25-34")  %>% # "Y25-34"
+  filter(Variable == input$variable_region) %>% #"hosp_dis_t17") %>% # variable
+  filter(Dims == "dim4") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  # pluck(1) %>% 
+  as.data.frame()
+
+  })
+
+
+```
+
+
+
+```{r input_clust_13_r}
+
+selectInput("age_groups_region",
+            "Select an age group:",
+            choices = age_region)
+
+
+selectInput("variable_region",
+            "Select a variable:",
+            choices = "place_region") # variable_region
+
+```
+
+
+
+Row {.sidebar data-width=600}
+-----------------------------------------------------------------------
+
+
+
+```{r clust_13_map_r}
+selectInput("dimensions_region",
+            "Select the dimensions of the cluster:",
+            choices = c("Dimensions 1 and 2", "Dimensions 3 and 4"))
+
+
+renderPlot({
+
+fviz_cluster(react_hcpc_region(), 
+             axes = react_hcpc_axes_region(), 
+             repel = T, 
+             ggtheme = theme_bw() +
+  theme(text = element_text(family = "serif", size = 14),
+        title = element_text(color = "#990000")))
+  
+  })
+
+hr()
+
+h5(strong("About Cluster Analysis ...")) #,
+                                   p(h5("These plots aim at clustering countries into groups showing overall similar characteristics in terms of hospital discharges by disease categories:"))
+
+                                   p(h5("1. The", strong("clusters"), "were obtained using dimensionality reduction (PCA) and hierarchical clustering techniques.")) #,
+                                   p(h5("2. The first", strong("4 dimensions"),"represents about 70 - 80 pct. of the variability in the dataset.")) #))                                   
+```
+
+
+
+Row {data-width=400 .tabset}
+-----------------------------------------------------------------------
+
+### Dimension 1
+
+
+```{r clust_13_col_dim13_11_r}
+# data-height=500 
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Alternative Engine", "Diesel Engine"))`
+
+
+DT::renderDataTable({
+
+datatable(react_dim1_age_var_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+
+```
+
+
+
+### Dimension 2
+
+```{r clust_13_col_dim13_12_r}
+
+
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Electrical Engine", "Diesel excl. Hybrids"))` 
+### Cadre 1 - Tab 2
+
+
+DT::renderDataTable({
+
+datatable(react_dim2_age_var_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+### Dimension 3
+
+
+
+```{r clust_13_col_dim24_21_r}
+# Row {data-width=400 data-height=500 .tabset}
+# -----------------------------------------------------------------------
+
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Petrolium excl. Hybrids", "Other Engine"))`
+### Cadre 2 - Tab 1
+
+
+DT::renderDataTable({
+
+datatable(react_dim3_age_var_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+
+### Dimension 4
+
+```{r clust_13_col_dim24_22_r}
+# `r reactive(ifelse(input$car_13_dims == "Dimensions 1 and 2", "Petrolium Engine", "Gas Engine"))` 
+### Cadre 2 - Tab 2
+
+
+
+DT::renderDataTable({
+
+datatable(react_dim4_age_var_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), 
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("correlation", 
+            mark = ".", 
+            digits = 5) %>% 
+    formatRound("p.value", 
+            mark = ".", 
+            digits = 5)
+})
+
+```
+
+
+
+
+
+PCA/HCPC Raw Country data
+===============================================================================
+
+
+Row {data-height=100}
+-----------------------------------------------------------------------
+
+```{r react_cluster_raw, include=FALSE}
+
+
+
+react_hcpc_country_raw <- reactive({
+
+    data_hcpc <- HCPC_list_c %>% 
+      filter(Age == input$age_groups_country_raw) %>% 
+      filter(Variable == input$variable_country_raw) %>% ### Updated selection!
+      pluck("value", 1) # react_index_age()) # %>%  # react_index_age()) %>% 
+      
+    data_hcpc
+    
+  })
+
+
+react_hcpc_axes_country_raw = reactive({
+
+  axes = c()
+  
+    if(input$dimensions_country_raw == "Dimensions 1 and 2"){
+      
+     axes = 1:2 } else {
+     axes = 3:4
+      
+      
+    }
+
+    axes
+    
+  })
+
+
+### TESTING: Dimension 1
+
+# age_group_country_sel <- reactive({
+#     selection = input$age_groups_country # "Y25-34" # 
+#     selection
+#   })
+
+### List of variable selections as function of age group: Variables_sel_input
+# Variables_sel_input # indexed by 1-7 agegroups!!!
+age_group_country_sel_raw <- reactive({
+
+selection_age = tibble(AgeGroup = ages,
+                      Index = 1:7)
+
+selected_age = selection_age %>% 
+  filter(AgeGroup == input$age_groups_country_raw) %>% # "TOTAL") %>% # 
+  pull(Index)
+
+### Variable selection
+variables_sel_input[[selected_age]]
+
+})
+
+# Mapping function instead!!! Since 7 Age groups!!!
+
+
+
+    observeEvent(input$age_groups_country_raw, {
+    combi <- age_group_country_sel_raw() # Variable selection
+    updateSelectInput(session, "variable_country_raw", choices = combi)
+  })
+
+    
+    
+### Selection of RELEVANT VARIABLES per dimension FOR INTERPRETATION!!!!
+    
+    ### TESTING: Dimension 1
+
+# age_sel <- reactive({
+#     selection = input$age_groupsX # "Y25-34" # 
+#     selection
+#   })
+
+# Rownames of RELEVANT VARIABLES!!!
+combinaison1 <- reactive({
+  
+  res_PCA_dim12_c  %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_country_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim1") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+  })
+
+
+    observeEvent(input$variable_country_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi1 <- combinaison1()
+    updateSelectInput(session, "combi1", choices = combi1)
+  })
+
+
+
+  reactive_raw_combi1 <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_country_FULL %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_country_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi1) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Country = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+  
+  
+ ### TESTING: Dimension 2 
+  
+# Rownames of RELEVANT VARIABLES!!!
+combinaison2 <- reactive({
+  
+  res_PCA_dim12_c  %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_country_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim2") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+  })
+
+
+    observeEvent(input$variable_country_raw, { # age_group_country_sel_raw()Variable Selection!
+    combi2 <- combinaison2()
+    updateSelectInput(session, "combi2", choices = combi2)
+  })
+
+
+
+  reactive_raw_combi2 <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_country_FULL %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_country_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi2) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Country = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+  
+  
+
+
+### TESTING: Dimension 3
+
+# Rownames of RELEVANT VARIABLES!!!
+combinaison3 <- reactive({
+  
+  res_PCA_dim34_c  %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_country_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim3") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+  })
+
+
+    observeEvent(input$variable_country_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi3 <- combinaison3()
+    updateSelectInput(session, "combi3", choices = combi3)
+  })
+
+
+
+  reactive_raw_combi3 <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_country_FULL %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_country_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi3) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Country = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+  
+  
+ ### TESTING: Dimension 4 
+  
+# Rownames of RELEVANT VARIABLES!!!
+combinaison4 <- reactive({
+  
+  res_PCA_dim34_c  %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_country_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim34") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+    
+  })
+
+
+    observeEvent(input$variable_country_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi4 <- combinaison4()
+    updateSelectInput(session, "combi4", choices = combi4)
+  })
+
+
+
+  reactive_raw_combi4 <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_country_FULL %>% 
+  filter(Age == input$age_groups_country_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_country_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi4) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Country = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+```
+
+
+
+```{r input_clust_raw}
+
+selectInput("age_groups_country_raw",
+            "Select an age group:",
+            choices = age_country)
+
+
+selectInput("variable_country_raw",
+            "Select a variable:",
+            choices = "No Variables") # variable_country
+
+```
+
+
+
+Row {.sidebar data-width=600}
+-----------------------------------------------------------------------
+
+
+```{r clust_map_raw}
+
+selectInput("dimensions_country_raw",
+            "Select the dimensions of the cluster:",
+            choices = c("Dimensions 1 and 2", "Dimensions 3 and 4"))
+
+
+renderPlot({
+
+fviz_cluster(react_hcpc_country_raw(), 
+             axes = react_hcpc_axes_country_raw(), 
+             repel = T, 
+             ggtheme = theme_bw() +
+  theme(text = element_text(family = "serif", size = 14),
+        title = element_text(color = "#990000")))
+  
+  })
+
+hr()
+
+h5(strong("About Cluster Analysis ...")) #,
+                                   p(h5("These plots aim at clustering countries into groups showing overall similar characteristics in terms of hospital discharges by disease categories:"))
+
+                                   p(h5("1. The", strong("clusters"), "were obtained using dimensionality reduction (PCA) and hierarchical clustering techniques.")) #,
+                                   p(h5("2. The first", strong("4 dimensions"),"represents about 70 - 80 pct. of the variability in the dataset.")) #))                       
+```
+
+
+
+
+Row {data-width=400 .tabset}
+-----------------------------------------------------------------------
+
+### Dimension 1
+
+```{r dim1_raw_variables}
+
+
+
+selectInput("combi1",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi1(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         # columnDefs = list(list(className = 'dt-center')), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 2
+
+```{r dim2_raw_variables}
+
+
+
+selectInput("combi2",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi2(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         # columnDefs = list(list(className = 'dt-center')), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 3
+
+```{r dim3_raw_variables}
+
+
+
+selectInput("combi3",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi3(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         # columnDefs = list(list(className = 'dt-center')), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 4
+
+```{r dim4_raw_variables}
+
+
+
+selectInput("combi4",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi4(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         # columnDefs = list(list(className = 'dt-center')), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+
+PCA/HCPC Raw Region data
+===============================================================================
+
+
+Row {data-height=100}
+-----------------------------------------------------------------------
+
+```{r react_cluster_raw_region, include=FALSE}
+
+
+react_hcpc_region_raw <- reactive({
+
+    data_hcpc <- HCPC_list_r %>% 
+      filter(Age == input$age_groups_region_raw) %>% 
+      filter(Variable == input$variable_region_raw) %>% ### Updated selection!
+      pluck("value", 1) # react_index_age()) # %>%  # react_index_age()) %>% 
+      
+    data_hcpc
+    
+  })
+
+
+react_hcpc_axes_region_raw = reactive({
+
+  axes = c()
+  
+    if(input$dimensions_region_raw == "Dimensions 1 and 2"){
+      
+     axes = 1:2 } else {
+     axes = 3:4
+      
+      
+    }
+
+    axes
+    
+  })
+
+### TESTING: Dimension 1
+
+### List of variable selections as function of age group: Variables_sel_input
+# Variables_sel_input # indexed by 1-7 agegroups!!!
+age_group_region_sel_raw <- reactive({
+
+selection_age = tibble(AgeGroup = ages,
+                      Index = 1:7)
+
+selected_age = selection_age %>% 
+  filter(AgeGroup == input$age_groups_region_raw) %>% # "TOTAL") %>% # 
+  pull(Index)
+
+### Variable selection
+variables_sel_input_r[[selected_age]]
+
+})
+
+# Mapping function instead!!! Since 7 Age groups!!!
+
+
+
+    observeEvent(input$age_groups_region_raw, {
+    combi <- age_group_region_sel_raw() # Variable selection
+    updateSelectInput(session, "variable_region_raw", choices = combi)
+  })
+
+    
+    
+### Selection of RELEVANT VARIABLES per dimension FOR INTERPRETATION!!!!
+    
+    ### TESTING: Dimension 1
+
+# age_sel <- reactive({
+#     selection = input$age_groupsX # "Y25-34" # 
+#     selection
+#   })
+
+# Rownames of RELEVANT VARIABLES!!!
+combinaison1_r <- reactive({
+  
+  res_PCA_dim12_r  %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_region_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim1") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+    
+  })
+
+
+    observeEvent(input$variable_region_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi1 <- combinaison1_r()
+    updateSelectInput(session, "combi1_r", choices = combi1)
+  })
+
+
+
+  reactive_raw_combi1_r <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_region_FULL %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_region_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi1_r) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Region = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+  
+  
+ ### TESTING: Dimension 2 
+  
+# Rownames of RELEVANT VARIABLES!!!
+combinaison2_r <- reactive({
+  
+  res_PCA_dim12_r  %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_region_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim2") %>% 
+  pluck("Dimensions12") %>% 
+  pluck(1) %>% 
+  rownames()
+
+    
+  })
+
+
+    observeEvent(input$variable_region_raw, { # age_group_country_sel_raw()Variable Selection!
+    combi2 <- combinaison2_r()
+    updateSelectInput(session, "combi2_r", choices = combi2)
+  })
+
+
+
+  reactive_raw_combi2_r <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_region_FULL %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_region_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi2) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Region = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+  
+  
+
+
+### TESTING: Dimension 3
+
+# Rownames of RELEVANT VARIABLES!!!
+combinaison3_r <- reactive({
+  
+  res_PCA_dim34_r  %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_region_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim3") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+    
+  })
+
+
+    observeEvent(input$variable_region_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi3 <- combinaison3_r()
+    updateSelectInput(session, "combi3_r", choices = combi3)
+  })
+
+
+
+  reactive_raw_combi3_r <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_region_FULL %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_region_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi3_r) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Region = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+  
+  
+ ### TESTING: Dimension 4 
+  
+# Rownames of RELEVANT VARIABLES!!!
+combinaison4_r <- reactive({
+  
+  res_PCA_dim34_r  %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL") %>% ## age_sel()) %>% #"Y25-34") %>% #   #agegroup) %>% 
+  filter(Variable == input$variable_region_raw) %>% #"hosp_dis_t17") %>%
+  filter(Dims == "dim34") %>% 
+  pluck("Dimensions34") %>% 
+  pluck(1) %>% 
+  rownames()
+  
+
+  })
+
+
+    observeEvent(input$variable_region_raw, { # Variable Selection! age_group_country_sel_raw()
+    combi4 <- combinaison4_r()
+    updateSelectInput(session, "combi4_r", choices = combi4)
+  })
+
+
+
+  reactive_raw_combi4_r <- reactive({
+
+### Return of raw data for DT
+PCA_variables_ages_region_FULL %>% 
+  filter(Age == input$age_groups_region_raw) %>%  # "TOTAL" age_sel()) %>% # "Y25-34") %>% #"Y16-24" - input$age_groupsX
+  filter(Variable == input$variable_region_raw) %>% # "hosp_dis_t17") %>% 
+  pluck("value") %>% 
+  pluck(1) %>% 
+  gather(Disease_Category, Proportion, -geo) %>% 
+  filter(Disease_Category == input$combi4_r) %>%  # "E") %>% # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  # bind_rows() %>% 
+  # filter(combi %in% input$combi1) %>% # "6-9*ED0-2*M") %>%  #
+  
+  # deframe() %>% 
+  # pluck(45) %>% # index of combi from adjusted input!!!
+  rename(Region = geo) %>% 
+  # select(Country, Selection, Proportion) %>% 
+  arrange(-Proportion)
+
+})  
+
+```
+
+
+
+```{r input_clust_raw_region}
+
+selectInput("age_groups_region_raw",
+            "Select an age group:",
+            choices = age_region)
+
+
+selectInput("variable_region_raw",
+            "Select a variable:",
+            choices = "No Variables") # variable_country
+
+```
+
+
+
+Row {.sidebar data-width=600}
+-----------------------------------------------------------------------
+
+
+```{r clust_map_raw_region}
+
+selectInput("dimensions_region_raw",
+            "Select the dimensions of the cluster:",
+            choices = c("Dimensions 1 and 2", "Dimensions 3 and 4"))
+
+
+renderPlot({
+
+fviz_cluster(react_hcpc_region_raw(), 
+             axes = react_hcpc_axes_region_raw(), 
+             repel = T, 
+             ggtheme = theme_bw() +
+  theme(text = element_text(family = "serif", size = 14),
+        title = element_text(color = "#990000")))
+  
+  })
+
+hr()
+
+h5(strong("About Cluster Analysis ...")) #,
+                                   p(h5("These plots aim at clustering countries into groups showing overall similar characteristics in terms of hospital discharges by disease categories:"))
+
+                                   p(h5("1. The", strong("clusters"), "were obtained using dimensionality reduction (PCA) and hierarchical clustering techniques.")) #,
+                                   p(h5("2. The first", strong("4 dimensions"),"represents about 70 - 80 pct. of the variability in the dataset.")) #))                       
+```
+
+
+
+
+Row {data-width=400 .tabset}
+-----------------------------------------------------------------------
+
+### Dimension 1
+
+```{r dim1_raw_variables_region}
+
+
+
+selectInput("combi1_r",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi1_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 2
+
+```{r dim2_raw_variables_region}
+
+
+
+selectInput("combi2_r",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi2_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 3
+
+```{r dim3_raw_variables_region}
+
+
+
+selectInput("combi3_r",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi3_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
+
+
+### Dimension 4
+
+```{r dim4_raw_variables_region}
+
+
+
+selectInput("combi4_r",
+            "Select a variable:",
+            choices = "No Variables")
+
+DT::renderDataTable({
+
+datatable(reactive_raw_combi4_r(), 
+          # %>%  
+          #   arrange(-Year, -Registrations),
+          rownames=FALSE,
+          extensions = c("FixedColumns"),
+          options = list(scrollX = TRUE, 
+                         fixedColumns = list(leftColumns = 2),
+                         pageLength=10,
+                         columnDefs = list(list(className = 'dt-center', targets="_all")), # , targets = 1:5
+                         language = list(sSearch = "Filter:")))  %>% 
+formatRound("Proportion", 
+            mark = ".", 
+            digits = 1)
+})
+
+```
+
